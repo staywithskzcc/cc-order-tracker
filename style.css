@@ -1,0 +1,436 @@
+<style>
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+  -webkit-font-smoothing: auto;
+  text-rendering: optimizeSpeed;
+
+  background: #faf9f7;
+  margin: 0;
+  padding: 20px;
+  color: #444;
+}
+
+  .container {
+    max-width: 580px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    text-align: center;
+    color: #76a5c2;
+    margin-bottom: 4px;
+    font-size: 24px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 18px;
+  }
+
+  .section-title {
+    font-size: 17px;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    color: #557a8a;
+    font-weight: 600;
+  }
+
+  .card {
+    background: #ffffff;
+    padding: 16px 18px;
+    margin-top: 12px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* 官方聯絡方式卡片 */
+  .contact-card {
+    background: linear-gradient(135deg, #fff9f3, #fffdf7);
+    border-left: 4px solid #f2b082;
+    box-shadow: 0 5px 16px rgba(242, 176, 130, 0.25);
+  }
+
+  .contact-card .label-main {
+    font-size: 16px;
+    font-weight: 700;
+    color: #d07a45;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .contact-sub {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #9c5a32;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #557a8a;
+  }
+
+  .status {
+    font-size: 16px;
+    font-weight: 700;
+    color: #345e7b;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+
+  .small {
+    font-size: 12px;
+    color: #888;
+  }
+
+  .input-box {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid #d8d8d8;
+    margin-bottom: 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .button {
+    width: 100%;
+    padding: 11px;
+    background: #76a5c2;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .button:hover {
+    background: #6c9bb8;
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 14px;
+    color: #aa6e6e;
+    font-size: 14px;
+  }
+
+  .sub-sep {
+    border: none;
+    border-top: 1px dashed #eee;
+    margin: 8px 0 10px;
+  }
+
+  /* ===== 表格 ===== */
+  .table-wrapper {
+    margin-top: 10px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 10px 12px;
+    overflow-x: auto;
+  }
+
+  .order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .order-table th,
+  .order-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  /* ===== 訂單查詢：chip 欄位置中 ===== */
+  .order-table td:nth-child(2),
+  .order-table td:nth-child(3),
+  .order-table td:nth-child(4) {
+    text-align: center;
+  }
+
+  .order-table th {
+    background: #f3f6f9;
+    color: #557a8a;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  /* ===== 訂單查詢：表頭文字置中 ===== */
+  .order-table th:nth-child(2),
+  .order-table th:nth-child(3),
+  .order-table th:nth-child(4) {
+    text-align: center;
+  }
+
+  /* ===== Tabs ===== */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #e3edf3;
+    color: #557a8a;
+    transition: all 0.15s ease;
+  }
+
+  .tab-btn.active {
+    background: #76a5c2;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(118, 165, 194, 0.4);
+  }
+
+  .page {
+    display: none;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  @media (max-width: 600px) {
+    body {
+      padding: 14px;
+    }
+
+    .card {
+      padding: 14px 15px;
+    }
+  }
+
+  /* ===== FAQ 區塊樣式 ===== */
+  #faq-page .card {
+    margin-top: 10px;
+    padding: 14px 16px;
+  }
+
+  .faq-category-card {
+    margin-bottom: 18px;
+  }
+
+  .faq-category-header {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    background: #f7e7d7;
+    color: #5b4634;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  details.faq-item {
+    background: #ffffff;
+    padding: 9px 10px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  details.faq-item[open] {
+    border-color: #76a5c2;
+    background: #f7fbff;
+    box-shadow: 0 2px 6px rgba(118, 165, 194, 0.25);
+  }
+
+  details.faq-item summary {
+    list-style: none;
+    font-weight: 600;
+    color: #557a8a;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  details.faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-arrow {
+    margin-left: 10px;
+    font-size: 13px;
+    color: #9aa6b2;
+    transition: transform 0.18s ease;
+    flex-shrink: 0;
+  }
+
+  details.faq-item[open] .faq-arrow {
+    transform: rotate(90deg);
+  }
+
+  .faq-answer {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  /* 總團務頁面的「查看表單」連結樣式 */
+  .summary-link {
+    color: #76a5c2;
+    text-decoration: none;
+    border-bottom: 1px dotted #76a5c2;
+  }
+
+  .summary-link:visited {
+    color: #76a5c2;
+  }
+
+  .summary-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ===== 通路/特典狀態：彩色 chip ===== */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .chip-green {
+    background: #e7f4ea;
+    color: #2f6b3d;
+  }
+
+  .chip-red {
+    background: #fde7e7;
+    color: #8b2f2f;
+  }
+
+  .chip-purple {
+    background: #efe7fb;
+    color: #5a3a8b;
+  }
+
+  .chip-gray {
+    background: #eef1f4;
+    color: #4f5b66;
+  }
+
+  .chip-blue {
+    background: #e3f0fb;
+    color: #345e7b;
+  }
+
+  /* ===== 客人查詢專用補色（不影響通路頁） ===== */
+  .chip-yellow {
+    background: #fdecc8;
+    color: #8a6a00;
+  }
+
+  .chip-orange {
+    background: #fde5d3;
+    color: #9a3412;
+  }
+
+
+  /* ================================
+     ✅ 核心修正：版本標題 ↔ 狀態對齊
+     - 固定欄寬算法（table-layout: fixed）
+     - 版本欄置中
+     - 通路欄固定寬 + 靠左
+     ================================ */
+  .channel-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .channel-table th,
+  .channel-table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px 6px;
+    /* 讓標題與 chip 高度一致更好看 */
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
+
+  .channel-table th:first-child,
+  .channel-table td:first-child {
+    text-align: left;
+    width: 78px;
+    /* 你想更寬可改 80~90 */
+  }
+
+  /* 表格第一欄固定（桌機更好看；手機橫滑也不會迷路） */
+  .channel-table th:first-child,
+  .channel-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: #fff;
+    z-index: 2;
+  }
+
+  .channel-table th:first-child {
+    background: #f3f6f9;
+    z-index: 3;
+  }
+
+  /* ⬇⬇⬇ 就是這裡，加下面這整段 ⬇⬇⬇ */
+
+  /* ===== 訂單查詢：表頭文字置中（含備註） ===== */
+  .order-table th:nth-child(2),
+  .order-table th:nth-child(3),
+  .order-table th:nth-child(4),
+  .order-table th:nth-child(5) {
+    text-align: center;
+  }
+
+  /* ===== 訂單查詢：備註欄內容置中 ===== */
+  .order-table td:nth-child(5) {
+    text-align: center;
+  }
+
+
+  /* ===== 訂單查詢：chip 固定寬度，整齊對齊 ===== */
+
+  /* 付款方式 */
+  .order-table td:nth-child(2) .chip {
+    min-width: 120px;
+  }
+
+  /* 匯款狀態 */
+  .order-table td:nth-child(3) .chip {
+    min-width: 96px;
+  }
+
+  /* 團務狀態 */
+  .order-table td:nth-child(4) .chip {
+    min-width: 110px;
+  }
+</style>

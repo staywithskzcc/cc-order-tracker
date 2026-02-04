@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>CC 代購｜團務查詢</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- 只保留你自己的 CSS -->
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+
+<body>
+  <div class="container">
+    <h1>CC 代購｜團務查詢</h1>
+    <div class="subtitle">這裡可以查看目前團務與進度</div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-page="customer-page">訂單查詢</button>
+      <button class="tab-btn" data-page="summary-page">總團務進度</button>
+
+      <!-- 預設不顯示，等有資料再打開 -->
+      <button id="channel-tab" class="tab-btn" data-page="channel-page" style="display:none;">
+        通路/特典狀態
+      </button>
+
+      <button class="tab-btn" data-page="faq-page">FAQ&注意事項</button>
+    </div>
+
+    <!-- Page 1：客人查詢 -->
+    <div id="customer-page" class="page active">
+      <div class="section-title">📩 官方聯絡方式</div>
+      <div class="card contact-card">
+        <div class="label-main">哩賀！我是CC</div>
+        <p class="contact-sub">請記得加入群組，有問題歡迎私訊 🧸</p>
+        <p><span class="label">官方 LINE：</span>@456syetc</p>
+        <p><span class="label">Instagram：</span>staywithskz.cc</p>
+        <p class="small">建議使用官方 Line，有看到會馬上回覆</p>
+      </div>
+
+      <div class="section-title">🔍 客人查詢</div>
+      <form id="search-form">
+        <input class="input-box" id="customer-name" placeholder="請輸入本名（與填單一致）" />
+        <button class="button" type="submit">查詢我的訂單</button>
+
+        <div class="small" style="margin-top:6px;">
+          ＊目前僅支援以本名查詢。<br>
+          ＊完成之團務將不顯示於此頁，如需查詢請私訊CC。
+        </div>
+      </form>
+
+      <div id="result-list"></div>
+    </div>
+
+    <!-- Page 2：總團務進度 -->
+    <div id="summary-page" class="page">
+      <div class="section-title">📦 總團務進度</div>
+      <div id="summary-list">
+        <div class="small">讀取中…</div>
+      </div>
+    </div>
+
+    <!-- Page 3：通路 / 特典狀態 -->
+    <div id="channel-page" class="page">
+      <div class="section-title">🧾 通路 / 版本 特典＆斷貨狀態</div>
+      <div id="channel-list">
+        <div class="small">讀取中…</div>
+      </div>
+      <div class="small" style="margin-top:8px;">
+        ＊此頁僅在有需要時才會出現；若你看不到代表目前沒有公告內容。
+      </div>
+    </div>
+
+    <!-- Page 4：FAQ -->
+    <div id="faq-page" class="page">
+      <div class="section-title">❓ FAQ&注意事項</div>
+      <div class="card">
+        <div id="faq-list">
+          <div class="small">讀取中…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="script.js"></script>
+</body>
+
+</html>
