@@ -1,51 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-G8XCTTBM6B"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() {dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-G8XCTTBM6B');
   </script>
   <meta charset="UTF-8" />
-  <title>CC 代購｜團務查詢</title>
+  <title>CC 代購｜團務總網</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- 只保留你自己的 CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
+  <div class="menu-toggle" id="menu-toggle">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay"></div>
+
+  <div class="side-nav" id="side-nav">
+    <div class="side-nav-header">MENU 選單</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-page="customer-page">對帳查詢</button>
+      <button class="tab-btn" data-page="summary-page">總團務進度</button>
+      <button class="tab-btn" data-page="order-page">我要下單</button>
+      <button id="channel-tab" class="tab-btn" data-page="channel-page" style="display:none;">通路/特典狀態</button>
+      <button class="tab-btn" data-page="faq-page">FAQ&注意事項</button>
+    </div>
+  </div>
+
   <div class="container">
     <h1>CC 代購｜團務查詢</h1>
     <div class="subtitle">這裡可以查看目前團務與進度</div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" data-page="customer-page">訂單查詢</button>
-      <button class="tab-btn" data-page="summary-page">總團務進度</button>
-
-      <!-- 預設不顯示，等有資料再打開 -->
-      <button id="channel-tab" class="tab-btn" data-page="channel-page" style="display:none;">
-        通路/特典狀態
-      </button>
-
-      <button class="tab-btn" data-page="faq-page">FAQ&注意事項</button>
-    </div>
-
-    <!-- Page 1：客人查詢 -->
     <div id="customer-page" class="page active">
       <div class="section-title">📩 官方聯絡方式</div>
       <div class="card contact-card">
         <div class="label-main">哩賀！我是CC</div>
         <p class="contact-sub">請記得加入群組，有問題歡迎私訊 🧸</p>
-        <p><span class="label">官方 LINE：</span>@456syetc</p>
-        <p><span class="label">Instagram：</span>staywithskz.cc</p>
+        <p><span class="label">官方 LINE ： </span>@456syetc</p>
+        <p><span class="label">Instagram ： </span>staywithskz.cc</p>
         <p class="small">建議使用官方 Line，有看到會馬上回覆</p>
       </div>
 
@@ -53,17 +50,14 @@
       <form id="search-form">
         <input class="input-box" id="customer-name" placeholder="請輸入本名（與填單一致）" />
         <button class="button" type="submit">查詢我的訂單</button>
-
-        <div class="small" style="margin-top:6px;">
-          ＊目前僅支援以本名查詢。<br>
-          ＊完成之團務將不顯示於此頁，如需查詢請私訊CC。
+        <div class="small" style="margin-top:8px;">
+          *目前僅支援以本名查詢。<br>
+          *完成之團務將不顯示於此頁，如需查詢請私訊CC。
         </div>
       </form>
-
       <div id="result-list"></div>
     </div>
 
-    <!-- Page 2：總團務進度 -->
     <div id="summary-page" class="page">
       <div class="section-title">📦 總團務進度</div>
       <div id="summary-list">
@@ -71,30 +65,70 @@
       </div>
     </div>
 
-    <!-- Page 3：通路 / 特典狀態 -->
-    <div id="channel-page" class="page">
-      <div class="section-title">🧾 通路 / 版本 特典＆斷貨狀態</div>
-      <div id="channel-list">
-        <div class="small">讀取中…</div>
-      </div>
-      <div class="small" style="margin-top:8px;">
-        ＊此頁僅在有需要時才會出現；若你看不到代表目前沒有公告內容。
+    <div id="order-page" class="page">
+      <div class="section-title">🛒 選擇要下單的團務</div>
+      <select id="campaign-select" class="input-box select-beautify">
+        <option value="">-- 請選擇團務 --</option>
+      </select>
+      <div id="order-product-list" class="product-grid" style="display:none;"></div>
+      
+      <div id="cart-float-btn" onclick="toggleCartModal()">
+        🛒 <span id="cart-count">0</span>
       </div>
     </div>
 
-    <!-- Page 4：FAQ -->
+    <div id="channel-page" class="page">
+      <div class="section-title">🧾 通路 / 版本 特典＆斷貨狀態</div>
+      <div id="channel-list"><div class="small">讀取中…</div></div>
+      <div class="small" style="margin-top:12px;">*此分頁僅在有公告內容時才會出現。</div>
+    </div>
+
     <div id="faq-page" class="page">
       <div class="section-title">❓ FAQ&注意事項</div>
-      <div class="card">
-        <div id="faq-list">
-          <div class="small">讀取中…</div>
-        </div>
-      </div>
+      <div id="faq-list"><div class="small">讀取中…</div></div>
     </div>
   </div>
 
-  <!-- JS -->
+  <div id="product-detail-modal" class="modal">
+    <div class="modal-content">
+      <div id="detail-img-container" style="text-align:center; margin-bottom:15px;"></div>
+      <h3 id="detail-title" style="color:#557a8a; margin-bottom:5px;"></h3>
+      <p id="detail-price" style="color:#d07a45; font-weight:800; font-size:18px; margin-bottom:15px;"></p>
+      
+      <div class="label" style="margin-bottom:8px;">選擇款式 ：</div>
+      <select id="detail-variant-select" class="input-box select-beautify"></select>
+
+      <div class="label" style="margin-top:10px; margin-bottom:8px;">購買數量 ：</div>
+      <div class="qty-control">
+        <button onclick="changeDetailQty(-1)">-</button>
+        <input type="number" id="detail-qty" value="1" readonly>
+        <button onclick="changeDetailQty(1)">+</button>
+      </div>
+
+      <button class="button" id="add-to-cart-btn" style="margin-top:20px;">加入購物車</button>
+      <button class="button" style="background:#ccc; margin-top:8px;" onclick="closeProductModal()">取消返回</button>
+    </div>
+  </div>
+
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <h3 style="color:#76a5c2; margin-top:0;">🛍️ 您的購物清單</h3>
+      <div id="cart-items-container"></div>
+      <hr class="sub-sep">
+      <div class="total-price-text">總計金額：$<span id="cart-total-amount">0</span></div>
+      <div class="section-title" style="margin-top:15px; font-size:15px;">📝 填寫訂購資訊</div>
+      <form id="order-submit-form">
+        <input type="email" id="form-order-email" class="input-box" placeholder="Email (必填)" required>
+        <input type="tel" id="form-order-phone" class="input-box" placeholder="手機號碼 (必填)" required>
+        <input type="text" id="form-order-line" class="input-box" placeholder="LINE 群組名字 (必填)" required>
+        <input type="text" id="form-order-name" class="input-box" placeholder="本名 (必填)" required>
+        <input type="text" id="form-order-sort" class="input-box" placeholder="特典/滿額卡排序 (選填)">
+        <button type="submit" class="button">確認下單</button>
+        <button type="button" class="button" style="background:#ccc; margin-top:8px;" onclick="toggleCartModal()">繼續購物</button>
+      </form>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
-
 </html>
