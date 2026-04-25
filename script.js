@@ -98,8 +98,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const resList = document.getElementById("result-list"); resList.innerHTML = "";
     if (!name.trim()) return;
     if (!customerCache) customerCache = await fetchSheet(CUSTOMER_SHEET);
-    const matches = customerCache.filter(r => findVal(r, ["客人姓名"], 0) === name.trim() && findVal(r, ["團務狀態"], 4) !== "團務完成");
-    if (!matches.length) { resList.innerHTML = '<div class="no-data">查無與填單姓名相符之資料，請私訊CC做確認。</div>'; return; }
+
+    // 【修改核心邏輯】過濾掉狀態為空的列，只讀取你填過狀態的資料
+    const matches = customerCache.filter(r => {
+      const cName = findVal(r, ["客人姓名"], 0);
+      const cStatus = findVal(r, ["團務狀態"], 4);
+      return cName === name.trim() && cStatus !== "" && cStatus !== "團務完成";
+    });
+
+    if (!matches.length) { resList.innerHTML = '<div class="no-data">查無已核對之資料，若剛填單請待CC處理。</div>'; return; }
     let html = `<div class="table-wrapper"><table class="order-table"><thead><tr><th>團務名稱</th><th>付款</th><th>匯款</th><th>狀態</th><th>備註</th></tr></thead><tbody>`;
     matches.forEach(r => {
       html += `<tr><td>${findVal(r, ["團務名稱"], 1)}</td><td>${renderChip(findVal(r, ["付款方式"], 2))}</td><td>${renderChip(findVal(r, ["匯款狀態"], 3))}</td><td>${renderChip(findVal(r, ["團務狀態"], 4))}</td><td>${findVal(r, ["備註"], 5)}</td></tr>`;
