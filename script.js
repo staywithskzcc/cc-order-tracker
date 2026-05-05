@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SPREADSHEET_ID = "1tdpM1QqVYRb9mFNOSG2Ef8GeKVDlfQ-WaHNTQVpmkzI";
   const GAS_URL = "https://script.google.com/macros/s/AKfycby5ZbpVmVG4TCgxoiybhCC-LixhB3s-bnBssP_AfxxZRq2IYQV7xGO4wuGp0QCLa7ctKg/exec";
 
-  const SUMMARY_SHEET = "總團務狀態"; 
+  const SUMMARY_SHEET = "總團務狀態";
   const CUSTOMER_SHEET = "客人團務";
   const FAQ_SHEET = "FAQ&注意事項";
   const CHANNEL_SHEET = "特典&通路狀態";
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "已收到款項": { bg: "#d5ecc1", text: "#4f8f63" },
     "-": { bg: "#ffe4a2", text: "#856b36" },
     "待官方出貨": { bg: "#fecfc8", text: "#a12524" },
+    "官方已出貨": { bg: "#ced2f5", text: "#b29ceb" },
     "已抵達集運": { bg: "#ffe4a2", text: "#856b36" },
     "已申請配送回台": { bg: "#e6cef2", text: "#7b5aa6" },
     "📦可下單": { bg: "#c1e1f1", text: "#548ac1" },
@@ -61,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const obj = {};
         r.c.forEach((cell, i) => {
           const key = cols[i];
-          if (!cell) { obj[key] = ""; } 
+          if (!cell) { obj[key] = ""; }
           else {
             const val = (cell.f !== undefined && cell.f !== null && cell.f !== "") ? cell.f : cell.v;
             obj[key] = (val !== null && val !== undefined) ? String(val) : "";
@@ -133,8 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div"); card.className = "card";
       let html = `<div class="status">${status}</div>`;
       grouped[status].forEach((e, i) => {
-        html += `${i>0 ? '<hr class="sub-sep">' : ''}<p><span class="label">名稱 ： </span>${e.item}</p>`;
-        if (e.note) html += `<p><span class="label">備註 ： </span>${e.note.replace(/\n/g,"<br>")}</p>`;
+        html += `${i > 0 ? '<hr class="sub-sep">' : ''}<p><span class="label">名稱 ： </span>${e.item}</p>`;
+        if (e.note) html += `<p><span class="label">備註 ： </span>${e.note.replace(/\n/g, "<br>")}</p>`;
         if (e.url) html += `<p><a class="summary-link" href="${e.url}" target="_blank">👉 查看表單網址</a></p>`;
       });
       card.innerHTML = html; container.appendChild(card);
@@ -162,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const color = FAQ_COLORS[index % FAQ_COLORS.length];
       let html = `<div class="faq-category-card"><div class="faq-category-header" style="background:${color.bg}; color:${color.text};">${cat}</div>`;
       grouped[cat].forEach(item => {
-        html += `<details class="faq-item"><summary><span>${item.q}</span> <span class="faq-arrow">▸</span></summary><div class="faq-answer">${item.a.replace(/\n/g,"<br>")}</div></details>`;
+        html += `<details class="faq-item"><summary><span>${item.q}</span> <span class="faq-arrow">▸</span></summary><div class="faq-answer">${item.a.replace(/\n/g, "<br>")}</div></details>`;
       });
       container.innerHTML += html + `</div>`;
     });
@@ -179,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const headers = Object.keys(data[0] || {});
     const channelKey = headers[0];
     const versionKeys = headers.slice(1);
-    const versionRow = data[0]; 
+    const versionRow = data[0];
     const rows = data.slice(1).filter(r => String(r[channelKey] || "").trim());
     const activeVersions = versionKeys.filter(vKey => rows.some(r => String(r[vKey] || "").trim()));
 
@@ -192,11 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return "chip-blue";
     }
 
-    let html = `<div class="table-wrapper"><table class="order-table channel-table"><thead><tr><th>通路</th>${activeVersions.map(vKey => `<th>${String(versionRow[vKey]||"").trim()}</th>`).join("")}</tr></thead><tbody>`;
+    let html = `<div class="table-wrapper"><table class="order-table channel-table"><thead><tr><th>通路</th>${activeVersions.map(vKey => `<th>${String(versionRow[vKey] || "").trim()}</th>`).join("")}</tr></thead><tbody>`;
     rows.forEach(r => {
-      html += `<tr><td><span class="label">${String(r[channelKey]||"").trim()}</span></td>`;
+      html += `<tr><td><span class="label">${String(r[channelKey] || "").trim()}</span></td>`;
       activeVersions.forEach(vKey => {
-        const val = String(r[vKey]||"").trim();
+        const val = String(r[vKey] || "").trim();
         html += `<td>${val ? `<span class="chip ${getChannelChipCls(val)}">${val}</span>` : ""}</td>`;
       });
       html += `</tr>`;
@@ -207,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let orderProducts = [];
   let cart = [];
-  let campaignGroups = {}; 
+  let campaignGroups = {};
   async function initOrderPage() {
     if (orderProducts.length) return;
     orderProducts = await fetchSheet(ORDER_ITEMS_SHEET);
@@ -232,14 +233,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const d = campaignGroups[cat];
       const card = document.createElement("div"); card.className = "product-card";
       card.onclick = () => openProductModal(cat);
-      card.innerHTML = `<img src="${d.img||''}" loading="lazy"><div class="p-category">${cat}</div><div class="p-price">$${d.price}</div><div class="small" style="color:#76a5c2; margin-top:5px;">點擊選款式</div>`;
+      card.innerHTML = `<img src="${d.img || ''}" loading="lazy"><div class="p-category">${cat}</div><div class="p-price">$${d.price}</div><div class="small" style="color:#76a5c2; margin-top:5px;">點擊選款式</div>`;
       container.appendChild(card);
     });
   }
 
   window.openProductModal = (catName) => {
     const d = campaignGroups[catName];
-    document.getElementById("detail-img-container").innerHTML = `<img src="${d.img||''}" style="width:100%; border-radius:15px;">`;
+    document.getElementById("detail-img-container").innerHTML = `<img src="${d.img || ''}" style="width:100%; border-radius:15px;">`;
     document.getElementById("detail-title").textContent = d.name;
     document.getElementById("detail-price").textContent = `$${d.price}`;
     document.getElementById("detail-qty").value = 1;
@@ -269,11 +270,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cart-total-amount").textContent = total;
   }
   window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); };
-  window.toggleCartModal = () => { const m = document.getElementById("cart-modal"); m.style.display = m.style.display==='block'?'none':'block'; };
+  window.toggleCartModal = () => { const m = document.getElementById("cart-modal"); m.style.display = m.style.display === 'block' ? 'none' : 'block'; };
 
   document.getElementById("order-submit-form").onsubmit = async function(e) {
-    e.preventDefault(); 
-    if(!cart.length) return alert("購物車是空的唷！");
+    e.preventDefault();
+    if (!cart.length) return alert("購物車是空的唷！");
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
@@ -287,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
       email: document.getElementById("form-order-email").value,
       sortPreference: document.getElementById("form-order-sort").value || "無",
       total: document.getElementById("cart-total-amount").textContent,
-      cartArray: cart 
+      cartArray: cart
     };
 
     try {
@@ -301,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cart = [];
       updateCartUI();
       toggleCartModal();
-      this.reset(); 
+      this.reset();
 
     } catch (error) {
       alert("送出失敗，請檢查網路或部署權限設定！");
@@ -327,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const data = await fetchSheet(CHANNEL_SHEET);
       if (data.length > 1) document.getElementById("channel-tab").style.display = "";
-    } catch(e) {}
+    } catch (e) { }
   }
   initChannelTabVisibility();
 });
