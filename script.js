@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "已收到款項": { bg: "#d5ecc1", text: "#4f8f63" },
     "-": { bg: "#ffe4a2", text: "#856b36" },
     "待官方出貨": { bg: "#fecfc8", text: "#a12524" },
-    "官方已出貨": { bg: "#b399c5", text: "#b29ceb" },
+    "官方已出貨": { bg: "#b399c5", text: "#FFFFFF" },
     "已抵達集運": { bg: "#ffe4a2", text: "#856b36" },
     "已申請配送回台": { bg: "#e6cef2", text: "#7b5aa6" },
     "📦可下單": { bg: "#c1e1f1", text: "#548ac1" },
