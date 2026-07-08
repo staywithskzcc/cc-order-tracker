@@ -100,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!name.trim()) return;
     if (!customerCache) customerCache = await fetchSheet(CUSTOMER_SHEET);
 
-    // 【修改核心邏輯】過濾掉狀態為空的列，只讀取你填過狀態的資料
     const matches = customerCache.filter(r => {
       const cName = findVal(r, ["客人姓名"], 0);
       const cStatus = findVal(r, ["團務狀態"], 4);
@@ -229,17 +228,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const variant = findVal(p, ["款式"], 2);
       const price = findVal(p, ["單價"], 3);
       const img = findVal(p, ["照片網址"], 4);
-
+      
       if (!campaignGroups[cat]) {
-        campaignGroups[cat] = {
-          camp,
-          name: cat,
-          price: price, // 預設封面的價格
-          img: img,
-          variants: []
+        campaignGroups[cat] = { 
+          camp, 
+          name: cat, 
+          price: price, 
+          img: img, 
+          variants: [] 
         };
       }
-      // 群組化時，將款式與它各自的價格以物件形式存成一個陣列
       campaignGroups[cat].variants.push({ name: variant, price: price });
     });
     Object.keys(campaignGroups).forEach(cat => {
@@ -255,17 +253,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const d = campaignGroups[catName];
     document.getElementById("detail-img-container").innerHTML = `<img src="${d.img || ''}" style="width:100%; border-radius:15px;">`;
     document.getElementById("detail-title").textContent = d.name;
-
-    // 預設載入第一個款式的單價
+    
     const defaultPrice = d.variants[0] ? d.variants[0].price : d.price;
     document.getElementById("detail-price").textContent = `$${defaultPrice}`;
     document.getElementById("detail-qty").value = 1;
-
+    
     const sel = document.getElementById("detail-variant-select");
-    // 將 value 設定為陣列的 index，方便切換選單時抓資料
     sel.innerHTML = d.variants.map((v, idx) => `<option value="${idx}">${v.name}</option>`).join("");
-
-    // 當使用者切換品項下拉選單時，動態同步畫面金額
+    
     sel.onchange = () => {
       const selectedIndex = sel.value;
       const selectedPrice = d.variants[selectedIndex].price;
@@ -276,14 +271,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedIndex = sel.value;
       const variantObj = d.variants[selectedIndex];
       const variantName = variantObj.name;
-      const currentPrice = variantObj.price; // 抓取該規格綁定的正確價格
+      const currentPrice = variantObj.price;
       const qty = parseInt(document.getElementById("detail-qty").value);
-
+      
       const existing = cart.find(i => i.camp === d.camp && i.cat === d.name && i.variant === variantName);
-      if (existing) {
-        existing.qty += qty;
-      } else {
-        cart.push({ camp: d.camp, cat: d.name, variant: variantName, price: currentPrice, qty });
+      if (existing) { 
+        existing.qty += qty; 
+      } else { 
+        cart.push({ camp: d.camp, cat: d.name, variant: variantName, price: currentPrice, qty }); 
       }
       updateCartUI(); closeProductModal();
     };
