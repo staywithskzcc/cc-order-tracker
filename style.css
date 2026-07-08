@@ -262,15 +262,23 @@ h1 {
   margin: 4px; /* ✅ 加入 margin 防止框框碰到隔壁 */
 }
 
-/* 通路表格 Sticky 邏輯 */
-.channel-table { table-layout: fixed; width: 100%; }
+/* 通路表格 Sticky 邏輯與寬度優化 */
+.channel-table { table-layout: auto; width: max-content; min-width: 100%; }
+
+.channel-table th, .channel-table td {
+  min-width: 100px; /* 確保每個特典版本格子至少有 100px 寬，不會被壓扁 */
+  padding: 12px 10px;
+}
+
 .channel-table th:first-child, .channel-table td:first-child {
   position: sticky;
   left: 0;
   background: #fff;
   z-index: 2;
-  width: 85px;
-  text-align: center !important; /* 通路標題也要置中 */
+  width: 90px;
+  min-width: 90px; /* 固定左側通路名稱欄寬度 */
+  text-align: center !important;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.05); /* 增加一點點陰影，滑動時視覺更清晰 */
 }
 .channel-table th:first-child { background: #f3f6f9; z-index: 3; }
 
