@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let orderProducts = [];
   let cart = [];
-  let campaignGroups = {};
+
   async function initOrderPage() {
     if (orderProducts.length) return;
     orderProducts = await fetchSheet(ORDER_ITEMS_SHEET);
@@ -222,45 +222,54 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("order-product-list");
     if (!camp) { container.style.display = "none"; return; }
     container.style.display = "grid"; container.innerHTML = "";
-    campaignGroups = {};
+
+    const localGroups = {};
     orderProducts.filter(p => findVal(p, ["團務名稱"], 0) === camp).forEach(p => {
       const cat = findVal(p, ["分類"], 1);
       const variant = findVal(p, ["款式"], 2);
       const price = findVal(p, ["單價"], 3);
       const img = findVal(p, ["照片網址"], 4);
-      
-      if (!campaignGroups[cat]) {
-        campaignGroups[cat] = { 
-          camp, 
-          name: cat, 
-          price: price, 
-          img: img, 
-          variants: [] 
+
+      if (!localGroups[cat]) {
+        localGroups[cat] = {
+          camp: camp,
+          name: cat,
+          price: price,
+          img: img,
+          variants: []
         };
       }
-      campaignGroups[cat].variants.push({ name: variant, price: price });
+      localGroups[cat].variants.push({ name: variant, price: price });
     });
-    Object.keys(campaignGroups).forEach(cat => {
-      const d = campaignGroups[cat];
-      const card = document.createElement("div"); card.className = "product-card";
-      card.onclick = () => openProductModal(cat);
+
+    Object.keys(localGroups).forEach(cat => {
+      const d = localGroups[cat];
+      const card = document.createElement("div"); 
+      card.className = "product-card";
+
+      const securePayload = btoa(encodeURIComponent(JSON.stringify(d)));
+      card.setAttribute("data-payload", securePayload);
+
+      card.onclick = () => openProductModalFromElement(card);
       card.innerHTML = `<img src="${d.img || ''}" loading="lazy"><div class="p-category">${cat}</div><div class="p-price">$${d.price}</div><div class="small" style="color:#76a5c2; margin-top:5px;">點擊選款式</div>`;
       container.appendChild(card);
     });
   }
 
-  window.openProductModal = (catName) => {
-    const d = campaignGroups[catName];
+  window.openProductModalFromElement = (element) => {
+    const rawPayload = element.getAttribute("data-payload");
+    const d = JSON.parse(decodeURIComponent(atob(rawPayload)));
+
     document.getElementById("detail-img-container").innerHTML = `<img src="${d.img || ''}" style="width:100%; border-radius:15px;">`;
     document.getElementById("detail-title").textContent = d.name;
-    
+
     const defaultPrice = d.variants[0] ? d.variants[0].price : d.price;
     document.getElementById("detail-price").textContent = `$${defaultPrice}`;
     document.getElementById("detail-qty").value = 1;
-    
+
     const sel = document.getElementById("detail-variant-select");
     sel.innerHTML = d.variants.map((v, idx) => `<option value="${idx}">${v.name}</option>`).join("");
-    
+
     sel.onchange = () => {
       const selectedIndex = sel.value;
       const selectedPrice = d.variants[selectedIndex].price;
@@ -273,17 +282,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const variantName = variantObj.name;
       const currentPrice = variantObj.price;
       const qty = parseInt(document.getElementById("detail-qty").value);
-      
+
       const existing = cart.find(i => i.camp === d.camp && i.cat === d.name && i.variant === variantName);
-      if (existing) { 
-        existing.qty += qty; 
-      } else { 
-        cart.push({ camp: d.camp, cat: d.name, variant: variantName, price: currentPrice, qty }); 
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ camp: d.camp, cat: d.name, variant: variantName, price: currentPrice, qty });
       }
       updateCartUI(); closeProductModal();
     };
     document.getElementById("product-detail-modal").style.display = "block";
   };
+
   window.closeProductModal = () => { document.getElementById("product-detail-modal").style.display = "none"; };
   window.changeDetailQty = (v) => { let i = document.getElementById("detail-qty"); i.value = Math.max(1, parseInt(i.value) + v); };
 
@@ -293,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("cart-items-container").innerHTML = cart.map((item, idx) => {
       const sub = Number(item.price) * item.qty; total += sub;
       return `<div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:10px;">
-        <div><b>${item.cat}</b><br><span class="small">${item.variant} x ${item.qty}</span></div>
+        <div><span style="background:#e3f0fb; color:#345e7b; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold; margin-right:4px;">${item.camp}</span><br><b>${item.cat}</b><br><span class="small">${item.variant} x ${item.qty}</span></div>
         <div style="font-weight:700;">$${sub} <span onclick="removeFromCart(${idx})" style="color:red; cursor:pointer; margin-left:10px;">✕</span></div>
       </div>`;
     }).join("");
@@ -302,23 +312,24 @@ document.addEventListener("DOMContentLoaded", () => {
   window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); };
   window.toggleCartModal = () => { const m = document.getElementById("cart-modal"); m.style.display = m.style.display === 'block' ? 'none' : 'block'; };
 
+  // ================= 一次打包直接發送的最新下單邏輯 =================
   document.getElementById("order-submit-form").onsubmit = async function(e) {
     e.preventDefault();
     if (!cart.length) return alert("購物車是空的唷！");
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = "處理中...";
+    submitBtn.textContent = "處理中..."; // ❌ 這裡完全沒有 (1/2) 囉！
 
     const orderData = {
-      campaign: cart[0].camp,
+      campaign: "MULTIPLE_CAMPAIGNS", 
       name: document.getElementById("form-order-name").value,
       lineName: document.getElementById("form-order-line").value,
       phone: document.getElementById("form-order-phone").value,
       email: document.getElementById("form-order-email").value,
       sortPreference: document.getElementById("form-order-sort").value || "無",
-      total: document.getElementById("cart-total-amount").textContent,
-      cartArray: cart
+      total: document.getElementById("cart-total-amount").textContent, 
+      cartArray: cart 
     };
 
     try {
