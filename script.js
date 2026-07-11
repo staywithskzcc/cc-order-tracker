@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const SPREADSHEET_ID = "1tdpM1QqVYRb9mFNOSG2Ef8GeKVDlfQ-WaHNTQVpmkzI";
-  const GAS_URL = "https://script.google.com/macros/s/AKfycby5ZbpVmVG4TCgxoiybhCC-LixhB3s-bnBssP_AfxxZRq2IYQV7xGO4wuGp0QCLa7ctKg/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbzeeiFWUqsEeMqQTIkyWmP-bus1d8xT4hw7PDps_IqXhdm1xwszolswescEV4ZB5aE6qg/exec";
 
   const SUMMARY_SHEET = "總團務狀態";
   const CUSTOMER_SHEET = "客人團務";
