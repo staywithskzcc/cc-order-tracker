@@ -207,6 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let orderProducts = [];
   let cart = [];
+  let campaignGroups = {}; // 還原全域變數宣告防止外部潛在引用報錯
 
   async function initOrderPage() {
     if (orderProducts.length) return;
@@ -223,15 +224,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!camp) { container.style.display = "none"; return; }
     container.style.display = "grid"; container.innerHTML = "";
 
-    const localGroups = {};
+    campaignGroups = {}; // 使用原本的全域變數做區域分組
     orderProducts.filter(p => findVal(p, ["團務名稱"], 0) === camp).forEach(p => {
       const cat = findVal(p, ["分類"], 1);
       const variant = findVal(p, ["款式"], 2);
       const price = findVal(p, ["單價"], 3);
       const img = findVal(p, ["照片網址"], 4);
 
-      if (!localGroups[cat]) {
-        localGroups[cat] = {
+      if (!campaignGroups[cat]) {
+        campaignGroups[cat] = {
           camp: camp,
           name: cat,
           price: price,
@@ -239,55 +240,55 @@ document.addEventListener("DOMContentLoaded", () => {
           variants: []
         };
       }
-      localGroups[cat].variants.push({ name: variant, price: price });
+      campaignGroups[cat].variants.push({ name: variant, price: price });
     });
 
-    Object.keys(localGroups).forEach(cat => {
-      const d = localGroups[cat];
-      const card = document.createElement("div"); 
+    Object.keys(campaignGroups).forEach(cat => {
+      const d = campaignGroups[cat];
+      const card = document.createElement("div");
       card.className = "product-card";
 
-      const securePayload = btoa(encodeURIComponent(JSON.stringify(d)));
-      card.setAttribute("data-payload", securePayload);
-
-      card.onclick = () => openProductModalFromElement(card);
+      // ✅ 還原 index.html 原本呼叫的函式名稱：openProductModal(cat)
+      card.onclick = () => openProductModal(cat);
       card.innerHTML = `<img src="${d.img || ''}" loading="lazy"><div class="p-category">${cat}</div><div class="p-price">$${d.price}</div><div class="small" style="color:#76a5c2; margin-top:5px;">點擊選款式</div>`;
       container.appendChild(card);
     });
   }
 
-  window.openProductModalFromElement = (element) => {
-    const rawPayload = element.getAttribute("data-payload");
-    const d = JSON.parse(decodeURIComponent(atob(rawPayload)));
+  // ✅ 名稱完美的改回原本的 openProductModal，確保 index.html 串接完全正常
+  window.openProductModal = (catName) => {
+    const d = campaignGroups[catName];
+    // 使用深度拷貝快照，完美解決切換選單時造成的團務名稱污染 Bug
+    const snapshot = JSON.parse(JSON.stringify(d));
 
-    document.getElementById("detail-img-container").innerHTML = `<img src="${d.img || ''}" style="width:100%; border-radius:15px;">`;
-    document.getElementById("detail-title").textContent = d.name;
+    document.getElementById("detail-img-container").innerHTML = `<img src="${snapshot.img || ''}" style="width:100%; border-radius:15px;">`;
+    document.getElementById("detail-title").textContent = snapshot.name;
 
-    const defaultPrice = d.variants[0] ? d.variants[0].price : d.price;
+    const defaultPrice = snapshot.variants[0] ? snapshot.variants[0].price : snapshot.price;
     document.getElementById("detail-price").textContent = `$${defaultPrice}`;
     document.getElementById("detail-qty").value = 1;
 
     const sel = document.getElementById("detail-variant-select");
-    sel.innerHTML = d.variants.map((v, idx) => `<option value="${idx}">${v.name}</option>`).join("");
+    sel.innerHTML = snapshot.variants.map((v, idx) => `<option value="${idx}">${v.name}</option>`).join("");
 
     sel.onchange = () => {
       const selectedIndex = sel.value;
-      const selectedPrice = d.variants[selectedIndex].price;
+      const selectedPrice = snapshot.variants[selectedIndex].price;
       document.getElementById("detail-price").textContent = `$${selectedPrice}`;
     };
 
     document.getElementById("add-to-cart-btn").onclick = () => {
       const selectedIndex = sel.value;
-      const variantObj = d.variants[selectedIndex];
+      const variantObj = snapshot.variants[selectedIndex];
       const variantName = variantObj.name;
       const currentPrice = variantObj.price;
       const qty = parseInt(document.getElementById("detail-qty").value);
 
-      const existing = cart.find(i => i.camp === d.camp && i.cat === d.name && i.variant === variantName);
+      const existing = cart.find(i => i.camp === snapshot.camp && i.cat === snapshot.name && i.variant === variantName);
       if (existing) {
         existing.qty += qty;
       } else {
-        cart.push({ camp: d.camp, cat: d.name, variant: variantName, price: currentPrice, qty });
+        cart.push({ camp: snapshot.camp, cat: snapshot.name, variant: variantName, price: currentPrice, qty });
       }
       updateCartUI(); closeProductModal();
     };
@@ -312,24 +313,23 @@ document.addEventListener("DOMContentLoaded", () => {
   window.removeFromCart = (idx) => { cart.splice(idx, 1); updateCartUI(); };
   window.toggleCartModal = () => { const m = document.getElementById("cart-modal"); m.style.display = m.style.display === 'block' ? 'none' : 'block'; };
 
-  // ================= 一次打包直接發送的最新下單邏輯 =================
   document.getElementById("order-submit-form").onsubmit = async function(e) {
     e.preventDefault();
     if (!cart.length) return alert("購物車是空的唷！");
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = "處理中..."; // ❌ 這裡完全沒有 (1/2) 囉！
+    submitBtn.textContent = "處理中...";
 
     const orderData = {
-      campaign: "MULTIPLE_CAMPAIGNS", 
+      campaign: "MULTIPLE_CAMPAIGNS",
       name: document.getElementById("form-order-name").value,
       lineName: document.getElementById("form-order-line").value,
       phone: document.getElementById("form-order-phone").value,
       email: document.getElementById("form-order-email").value,
       sortPreference: document.getElementById("form-order-sort").value || "無",
-      total: document.getElementById("cart-total-amount").textContent, 
-      cartArray: cart 
+      total: document.getElementById("cart-total-amount").textContent,
+      cartArray: cart
     };
 
     try {
