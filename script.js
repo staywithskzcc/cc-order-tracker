@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let orderProducts = [];
   let cart = [];
-  let campaignGroups = {}; // 還原全域變數宣告防止外部潛在引用報錯
+  let campaignGroups = {}; 
 
   async function initOrderPage() {
     if (orderProducts.length) return;
@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!camp) { container.style.display = "none"; return; }
     container.style.display = "grid"; container.innerHTML = "";
 
-    campaignGroups = {}; // 使用原本的全域變數做區域分組
+    campaignGroups = {}; 
     orderProducts.filter(p => findVal(p, ["團務名稱"], 0) === camp).forEach(p => {
       const cat = findVal(p, ["分類"], 1);
       const variant = findVal(p, ["款式"], 2);
@@ -248,17 +248,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "product-card";
 
-      // ✅ 還原 index.html 原本呼叫的函式名稱：openProductModal(cat)
       card.onclick = () => openProductModal(cat);
       card.innerHTML = `<img src="${d.img || ''}" loading="lazy"><div class="p-category">${cat}</div><div class="p-price">$${d.price}</div><div class="small" style="color:#76a5c2; margin-top:5px;">點擊選款式</div>`;
       container.appendChild(card);
     });
   }
 
-  // ✅ 名稱完美的改回原本的 openProductModal，確保 index.html 串接完全正常
   window.openProductModal = (catName) => {
     const d = campaignGroups[catName];
-    // 使用深度拷貝快照，完美解決切換選單時造成的團務名稱污染 Bug
     const snapshot = JSON.parse(JSON.stringify(d));
 
     document.getElementById("detail-img-container").innerHTML = `<img src="${snapshot.img || ''}" style="width:100%; border-radius:15px;">`;
@@ -316,6 +313,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("order-submit-form").onsubmit = async function(e) {
     e.preventDefault();
     if (!cart.length) return alert("購物車是空的唷！");
+
+    // 👇 新增的防呆提醒視窗 👇
+    const checkLine = confirm("⚠️ 【重要提醒】\n\n請問您是否已到官方LINE「綁定手機號碼」？\n\n✅ 已綁定：請點選「確定」送出訂單\n❌ 未綁定：請點選「取消」並先前往綁定");
+    
+    if (!checkLine) {
+      return; 
+    }
+    // 👆 新增結束 👆
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
