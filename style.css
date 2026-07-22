@@ -55,9 +55,17 @@ h1 {
   transition: all 0.3s ease;
 }
 
-.menu-toggle.open span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
-.menu-toggle.open span:nth-child(2) { opacity: 0; }
-.menu-toggle.open span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+.menu-toggle.open span:nth-child(1) {
+  transform: translateY(9.5px) rotate(45deg);
+}
+
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open span:nth-child(3) {
+  transform: translateY(-9.5px) rotate(-45deg);
+}
 
 .side-nav {
   position: fixed;
@@ -73,7 +81,9 @@ h1 {
   box-sizing: border-box;
 }
 
-.side-nav.open { left: 0; }
+.side-nav.open {
+  left: 0;
+}
 
 .side-nav-header {
   font-weight: 700;
@@ -110,9 +120,11 @@ h1 {
 
 .menu-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.4);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
   z-index: 999;
   display: none;
   backdrop-filter: blur(2px);
@@ -125,8 +137,13 @@ h1 {
 /* ==========================================
    3. 頁面內容與卡片
    ========================================== */
-.page { display: none; }
-.page.active { display: block; }
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
 
 .section-title {
   font-size: 17px;
@@ -203,7 +220,9 @@ h1 {
   transition: background 0.2s;
 }
 
-.button:hover { background: #6c9bb8; }
+.button:hover {
+  background: #6c9bb8;
+}
 
 .no-data {
   text-align: center;
@@ -235,12 +254,21 @@ h1 {
 }
 
 /* ✅ 強制所有標題與內容文字置中 */
-.order-table th, .order-table td {
+.order-table th,
+.order-table td {
   padding: 12px 8px;
   border-bottom: 1px solid #eee;
-  text-align: center !important; 
+  text-align: center !important;
   white-space: nowrap;
   vertical-align: middle;
+}
+
+/* ✅ 讓對帳表最後一欄（備註欄）允許換行，解決長備註顯示不出的問題 */
+.order-table td:last-child {
+  white-space: normal !important;
+  word-break: break-word;
+  min-width: 120px;
+  max-width: 200px;
 }
 
 .order-table th {
@@ -259,28 +287,38 @@ h1 {
   border: 1px solid rgba(0, 0, 0, 0.05);
   white-space: nowrap;
   justify-content: center;
-  margin: 4px; /* ✅ 加入 margin 防止框框碰到隔壁 */
+  margin: 4px;
 }
 
 /* 通路表格 Sticky 邏輯與寬度優化 */
-.channel-table { table-layout: auto; width: max-content; min-width: 100%; }
+.channel-table {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
+}
 
-.channel-table th, .channel-table td {
-  min-width: 100px; /* 確保每個特典版本格子至少有 100px 寬，不會被壓扁 */
+.channel-table th,
+.channel-table td {
+  min-width: 100px;
   padding: 12px 10px;
 }
 
-.channel-table th:first-child, .channel-table td:first-child {
+.channel-table th:first-child,
+.channel-table td:first-child {
   position: sticky;
   left: 0;
   background: #fff;
   z-index: 2;
   width: 90px;
-  min-width: 90px; /* 固定左側通路名稱欄寬度 */
+  min-width: 90px;
   text-align: center !important;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.05); /* 增加一點點陰影，滑動時視覺更清晰 */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
-.channel-table th:first-child { background: #f3f6f9; z-index: 3; }
+
+.channel-table th:first-child {
+  background: #f3f6f9;
+  z-index: 3;
+}
 
 /* ==========================================
    5. 總團務進度與 FAQ
@@ -309,7 +347,7 @@ h1 {
   display: inline-flex;
   padding: 6px 14px;
   border-radius: 999px;
-  font-size: 15px; 
+  font-size: 15px;
   font-weight: 700;
   margin: 15px 0 10px;
 }
@@ -328,7 +366,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   font-weight: 600;
-  font-size: 16px; 
+  font-size: 16px;
   color: #557a8a;
 }
 
@@ -375,8 +413,17 @@ details[open] .faq-arrow {
   border-radius: 10px;
 }
 
-.p-category { font-weight: 700; font-size: 14px; color: #557a8a; margin-top: 8px; }
-.p-price { color: #d07a45; font-weight: 600; }
+.p-category {
+  font-weight: 700;
+  font-size: 14px;
+  color: #557a8a;
+  margin-top: 8px;
+}
+
+.p-price {
+  color: #d07a45;
+  font-weight: 600;
+}
 
 .qty-control {
   display: flex;
@@ -438,7 +485,10 @@ details[open] .faq-arrow {
 .modal {
   display: none;
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   backdrop-filter: blur(4px);
@@ -466,19 +516,57 @@ details[open] .faq-arrow {
 /* ==========================================
    8. 原始 Chip 顏色設定
    ========================================== */
-.chip-green { background: #e7f4ea; color: #2f6b3d; }
-.chip-red { background: #fde7e7; color: #8b2f2f; }
-.chip-purple { background: #efe7fb; color: #5a3a8b; }
-.chip-gray { background: #eef1f4; color: #4f5b66; }
-.chip-blue { background: #e3f0fb; color: #345e7b; }
-.chip-yellow { background: #fdecc8; color: #8a6a00; }
-.chip-orange { background: #fde5d3; color: #9a3412; }
+.chip-green {
+  background: #e7f4ea;
+  color: #2f6b3d;
+}
 
-.small { font-size: 12px; color: #999; }
+.chip-red {
+  background: #fde7e7;
+  color: #8b2f2f;
+}
+
+.chip-purple {
+  background: #efe7fb;
+  color: #5a3a8b;
+}
+
+.chip-gray {
+  background: #eef1f4;
+  color: #4f5b66;
+}
+
+.chip-blue {
+  background: #e3f0fb;
+  color: #345e7b;
+}
+
+.chip-yellow {
+  background: #fdecc8;
+  color: #8a6a00;
+}
+
+.chip-orange {
+  background: #fde5d3;
+  color: #9a3412;
+}
+
+.small {
+  font-size: 12px;
+  color: #999;
+}
 
 /* 手機版微調 */
 @media (max-width: 600px) {
-  body { padding: 14px; }
-  .card { padding: 14px 15px; }
-  h1 { margin-top: 50px; }
+  body {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 14px 15px;
+  }
+
+  h1 {
+    margin-top: 50px;
+  }
 }
