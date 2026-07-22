@@ -45,11 +45,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const keys = Object.keys(row);
     for (let opt of options) {
       const match = keys.find(k => k.trim().toLowerCase() === opt.toLowerCase());
-      if (match && row[match]) return String(row[match]).trim();
+      if (match && row[match] !== undefined && row[match] !== null) return String(row[match]).trim();
     }
-    return row[`col_${fallbackIdx}`] ? String(row[`col_${fallbackIdx}`]).trim() : "";
+    return row[`col_${fallbackIdx}`] !== undefined && row[`col_${fallbackIdx}`] !== null ? String(row[`col_${fallbackIdx}`]).trim() : "";
   }
 
+  // 🛠️ 重構 Google Sheet 抓取邏輯，確保長文字/非數字 100% 被讀出
   async function fetchSheet(sheetName) {
     const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
     try {
@@ -57,15 +58,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const text = await res.text();
       const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
       const json = JSON.parse(jsonStr);
-      const cols = json.table.cols.map((c, i) => (c.label && c.label.trim()) ? c.label.trim() : `col_${i}`);
+      const cols = json.table.cols.map((c, i) => (c && c.label && c.label.trim()) ? c.label.trim() : `col_${i}`);
       return json.table.rows.map(r => {
         const obj = {};
+        if (!r.c) return obj;
         r.c.forEach((cell, i) => {
           const key = cols[i];
-          if (!cell) { obj[key] = ""; }
-          else {
-            const val = (cell.f !== undefined && cell.f !== null && cell.f !== "") ? cell.f : cell.v;
-            obj[key] = (val !== null && val !== undefined) ? String(val) : "";
+          if (!cell) {
+            obj[key] = "";
+          } else {
+            // ✅ 強制全面備用判斷：不論 cell 是字串、數字還是物件，皆轉換為原始字串
+            let val = "";
+            if (cell.v !== undefined && cell.v !== null) {
+              val = cell.v;
+            } else if (cell.f !== undefined && cell.f !== null) {
+              val = cell.f;
+            }
+            obj[key] = String(val).trim();
           }
         });
         return obj;
@@ -109,7 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!matches.length) { resList.innerHTML = '<div class="no-data">查無已核對之資料，若剛填單請待CC處理。</div>'; return; }
     let html = `<div class="table-wrapper"><table class="order-table"><thead><tr><th>團務名稱</th><th>付款</th><th>匯款</th><th>狀態</th><th>備註</th></tr></thead><tbody>`;
     matches.forEach(r => {
-      html += `<tr><td>${findVal(r, ["團務名稱"], 1)}</td><td>${renderChip(findVal(r, ["付款方式"], 2))}</td><td>${renderChip(findVal(r, ["匯款狀態"], 3))}</td><td>${renderChip(findVal(r, ["團務狀態"], 4))}</td><td>${findVal(r, ["備註"], 5)}</td></tr>`;
+      // ✅ 支援長文字換行渲染
+      const noteText = findVal(r, ["備註"], 5).replace(/\n/g, "<br>");
+      html += `<tr><td>${findVal(r, ["團務名稱"], 1)}</td><td>${renderChip(findVal(r, ["付款方式"], 2))}</td><td>${renderChip(findVal(r, ["匯款狀態"], 3))}</td><td>${renderChip(findVal(r, ["團務狀態"], 4))}</td><td>${noteText}</td></tr>`;
     });
     resList.innerHTML = html + "</tbody></table></div>";
   }
@@ -207,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let orderProducts = [];
   let cart = [];
-  let campaignGroups = {}; 
+  let campaignGroups = {};
 
   async function initOrderPage() {
     if (orderProducts.length) return;
@@ -224,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!camp) { container.style.display = "none"; return; }
     container.style.display = "grid"; container.innerHTML = "";
 
-    campaignGroups = {}; 
+    campaignGroups = {};
     orderProducts.filter(p => findVal(p, ["團務名稱"], 0) === camp).forEach(p => {
       const cat = findVal(p, ["分類"], 1);
       const variant = findVal(p, ["款式"], 2);
@@ -314,13 +325,11 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     if (!cart.length) return alert("購物車是空的唷！");
 
-    // 👇 新增的防呆提醒視窗 👇
     const checkLine = confirm("⚠️ 【重要提醒】\n\n請問您是否已到官方LINE「綁定手機號碼」？\n\n✅ 已綁定：請點選「確定」送出訂單\n❌ 未綁定：請點選「取消」並先前往綁定");
-    
+
     if (!checkLine) {
-      return; 
+      return;
     }
-    // 👆 新增結束 👆
 
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
